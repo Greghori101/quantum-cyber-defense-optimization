@@ -1,0 +1,5 @@
+Method,QUBO energy,Gap-to-CP-SAT %,Runtime (s),Backend
+Greedy,152.8038,210.676,0.0,classical
+CP-SAT,-138.0638,0.0,0.045,classical reference
+Local QAOA,-136.7491,0.952,0.429,AerSimulator
+IBM QAOA,-136.0254,1.476,7.308,ibm_marrakesh

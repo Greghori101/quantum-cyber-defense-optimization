@@ -1,0 +1,15 @@
+nodes,horizon,qubits,method,qubo_energy,closed_loop_cost,gap_to_best_found_%,proven_optimal,runtime_sec,backend,job_id,shots,depth,qubo_energy_pruned,gap_to_optimum_%,kept_coupling_%,cx_count,logical_qubits,physical_qubits
+4,4,16,VQAOA_local_p2,-135.4747,46.655,,,0.716,AerSimulator,,2048,59,-135.7456,1.875,99.87,,,
+6,4,24,VQAOA_local_p2,-177.5462,56.0784,,,67.259,AerSimulator,,2048,79,-183.4885,,96.69,,,
+8,8,64,CP-SAT,-3603.5012,290.3671,0.0,False,20.0526,classical,,0,0,,,,,,
+8,8,64,SimulatedAnnealing,-3594.4082,296.5242,0.252,False,272.5173,classical,,0,0,,,,,,
+8,8,64,IBM_QAOA_p2_transfer,-3462.432,339.1575,3.915,,30.212,ibm_marrakesh,d8ipm666983c73dsegsg,2048,4095,-4381.4718,,60.09,0.0,64.0,156.0
+8,8,64,Greedy,8557.4376,89.3025,337.476,False,0.0,classical,,0,0,,,,,,
+16,8,128,CP-SAT,-7001.3569,535.9052,0.0,False,20.1214,classical,,0,0,,,,,,
+16,8,128,SimulatedAnnealing,-6962.3764,562.1299,0.557,False,1044.3008,classical,,0,0,,,,,,
+16,8,128,IBM_QAOA_p2_transfer,-6463.004,551.5539,7.689,,7.796,ibm_marrakesh,d8ipmee6983c73dseh60,2048,6066,-10952.4215,,43.45,0.0,128.0,156.0
+16,8,128,Greedy,17791.2885,143.5475,354.112,False,0.0,classical,,0,0,,,,,,
+19,8,152,CP-SAT,-8180.884,649.7285,0.0,False,20.1571,classical,,0,0,,,,,,
+19,8,152,SimulatedAnnealing,-8145.1915,700.5772,0.436,False,1426.8319,classical,,0,0,,,,,,
+19,8,152,IBM_QAOA_p2_transfer,-7434.7824,695.5127,9.12,,8.165,ibm_marrakesh,d8ipmglv8cos73f5t9l0,2048,8019,-13619.0475,,46.43,0.0,152.0,156.0
+19,8,152,Greedy,21423.9602,181.3227,361.878,False,0.0,classical,,0,0,,,,,,

@@ -1,0 +1,7 @@
+qubits,Method,QUBO energy,Gap-to-CP-SAT %,Retained couplings %,Runtime (s),Backend
+64,CP-SAT (reference),-3603.5012,0.0,100.0,20.045,classical
+64,IBM QAOA,-3454.6028,4.132,60.09,7.47,ibm_marrakesh
+128,CP-SAT (reference),-6996.5503,0.0,100.0,20.12,classical
+128,IBM QAOA,-6501.2573,7.079,43.45,7.827,ibm_marrakesh
+152,CP-SAT (reference),-8179.5328,0.0,100.0,20.219,classical
+152,IBM QAOA,-7533.3758,7.9,46.43,32.916,ibm_marrakesh

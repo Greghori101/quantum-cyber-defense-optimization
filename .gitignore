@@ -1,0 +1,24 @@
+# Ignore everything
+*
+
+# Allow directories to be traversed
+!*/
+
+# Keep gitignore itself
+!.gitignore
+
+# Keep README
+!README.md
+
+# Keep all Jupyter notebooks
+!*.ipynb
+
+# Keep all LaTeX files
+!*.tex
+
+!images/
+!images/**
+
+# Keep data directory and its contents
+!data/
+!data/**
