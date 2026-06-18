@@ -55,11 +55,11 @@ The evaluation is organized into two panels. The first panel validates the metho
 
 \section{Introduction}
 
-Cyber defense is not a one-shot classification task. A network evolves continuously as adversaries gather information, exploit vulnerable assets, and move across connected systems, so a defender must decide not only which nodes are currently compromised but also which nodes should receive limited defensive resources over a future horizon. This matches a control-theoretic view of security, in which defense actions respond to evolving information and uncertain attacker progression~\cite{miehling2019control,rasouli2014supervisory}, as also studied in moving target defense, where the defender dynamically reshapes the attack surface~\cite{zhu2013game,cho2019mtd}.
+Cyber defense is not a one-shot classification task. A network evolves continuously as adversaries gather information, exploit vulnerable assets, and move across connected systems, so a defender must decide not only which nodes are currently compromised but also which nodes should receive limited defensive resources over a future horizon. This matches a control-theoretic view of security, in which defense actions respond to evolving information and uncertain attacker progression~\cite{miehling2019control,rasouli2014supervisory}, as also studied in moving target defense, where the defender dynamically reshapes the attack surface~\cite{zhu2013game,zhang2025mtd}.
 
 Classical control theory provides a principled language for such problems. Linear Quadratic Regulator (LQR) formulations balance two competing objectives: reducing the risk represented by the system state---compromise, attacker knowledge, vulnerability exposure, and critical-asset risk---against the cost of excessive control effort. The vulnerability term is motivated by operational scoring systems such as CVSS~\cite{nistcvss,firstcvss}. Because defense decisions are typically discrete (patch a node or not), the resulting control problem can be cast as a binary optimization problem. Quantum Approximate Optimization Algorithm (QAOA) is a variational optimization method designed for binary combinatorial problems on NISQ hardware~\cite{farhi2014qaoa,cerezo2021variational}. The central idea of this work is to use LQR as a mathematically interpretable generator of cyber-defense QUBOs and to evaluate whether those QUBOs can be solved on current IBM quantum hardware.
 
-A meaningful classical reference is essential, since comparing a quantum method only against a weak heuristic can overstate performance. We therefore adopt CP-SAT---an integer-programming and combinatorial solver from the Google OR-Tools suite---as the primary reference~\cite{ortoolsdoc,perron2023cpsat}, following benchmarking recommendations for transparent classical baselines and hardware-aware solution-quality metrics~\cite{lubinski2024optimization}. The evaluation separates a validation panel (Greedy, CP-SAT, Local QAOA, and IBM QAOA on the same full 16-qubit QUBO) from a scalability panel (CP-SAT and IBM QAOA on 64-, 128-, and 152-qubit instances).
+A meaningful classical reference is essential, since comparing a quantum method only against a weak heuristic can overstate performance. We therefore adopt CP-SAT---an integer-programming and combinatorial solver from the Google OR-Tools suite---as the primary reference~\cite{ortoolsdoc,perron2023cpsat}, consistent with recent benchmarking practices for quantum optimization~\cite{lubinski2024optimization}. The evaluation separates a validation panel (Greedy, CP-SAT, Local QAOA, and IBM QAOA on the same full 16-qubit QUBO) from a scalability panel (CP-SAT and IBM QAOA on 64-, 128-, and 152-qubit instances).
 
 The contributions of this paper are:
 \begin{itemize}
@@ -73,11 +73,11 @@ The contributions of this paper are:
 \section{Related Work}
 \label{sec:related}
 
-Control-theoretic approaches treat defense as a dynamic decision problem rather than a static detection task: defense actions are prescribed from feedback information as an attacker progresses~\cite{miehling2019control}, dynamic security has been cast as a supervisory control problem with imperfect information solved by dynamic programming under a min-max criterion~\cite{rasouli2014supervisory}, and feedback-driven moving target defense reshapes the attack surface over time~\cite{zhu2013game}, motivated by the limits of purely reactive security~\cite{cho2019mtd}. Controllability analyses of linear models further support studying cyber systems with state-space concepts~\cite{astafieva2025optimal}.
+Control-theoretic approaches treat defense as a dynamic decision problem rather than a static detection task: defense actions are prescribed from feedback information as an attacker progresses~\cite{miehling2019control}, dynamic security has been cast as a supervisory control problem with imperfect information solved by dynamic programming under a min-max criterion~\cite{rasouli2014supervisory}, and feedback-driven moving target defense reshapes the attack surface over time~\cite{zhu2013game}, motivated by the limits of purely reactive security~\cite{zhang2025mtd}. Controllability analyses of linear models further support studying cyber systems with state-space concepts~\cite{astafieva2025optimal}.
 
-Network structure shapes cyber-risk propagation. Positive-systems and epidemic models over directed graphs admit characterizable stability conditions~\cite{khanafer2016stability}. Vulnerability exposure is commonly quantified using CVSS metrics~\cite{nistcvss,firstcvss}.
+Network structure shapes cyber-risk propagation. Positive-systems and epidemic models over directed graphs admit characterizable stability conditions~\cite{pirani2022survey}. Vulnerability exposure is commonly quantified using CVSS metrics~\cite{nistcvss,firstcvss}.
 
-On the quantum side, QAOA performs approximate combinatorial optimization with depth set by an integer $p$\cite{farhi2014qaoa}, and variational quantum algorithms more broadly face challenges in trainability, accuracy, noise, and sampling\cite{cerezo2021variational}, including barren plateaus where the landscape becomes nearly flat~\cite{mcclean2018barren}. Quantum methods in cybersecurity have so far centered on cryptography~\cite{bennett1984quantum} and machine learning~\cite{garg2022quantum}. For the classical reference, CP-SAT is an integer-programming and combinatorial solver in Google OR-Tools~\cite{ortoolsdoc,perron2023cpsat}, and we report gap-to-reference metrics following quantum optimization benchmarking methodology~\cite{lubinski2024optimization}.
+On the quantum side, QAOA performs approximate combinatorial optimization with depth set by an integer $p$\cite{farhi2014qaoa}, and variational quantum algorithms more broadly face challenges in trainability, accuracy, noise, and sampling\cite{cerezo2021variational}, including barren plateaus where the landscape becomes nearly flat~\cite{larocca2025barren}. Quantum methods in cybersecurity have so far centered on cryptography~\cite{bennett1984quantum} and machine learning~\cite{cherbal2024security}. For the classical reference, CP-SAT is an integer-programming and combinatorial solver in Google OR-Tools~\cite{ortoolsdoc,perron2023cpsat}, and we report gap-to-reference metrics consistent with recent quantum optimization benchmarking practices~\cite{lubinski2024optimization}.
 
 
 \section{Cyber-Defense State-Space Model}
@@ -216,7 +216,7 @@ CP-SAT is used as the primary classical reference. The QUBO contains quadratic b
 \begin{equation}
 y_{ij}\leq U_i,\qquad y_{ij}\leq U_j,\qquad y_{ij}\geq U_i+U_j-1
 \end{equation}
-linearize the product. CP-SAT then minimizes the scaled linearized objective. This follows the integer-programming requirement of CP-SAT, where non-integer terms must be scaled to integers~\cite{ortoolsdoc}. CP-SAT is not described as an exact proof of global optimality for all large instances because a time limit is used; instead, it is treated as a strong classical reference.
+linearize the product. CP-SAT then minimizes the scaled linearized objective. Following standard binary quadratic linearization techniques compatible with integer programming, auxiliary variables are introduced before solving with CP-SAT, where non-integer terms must be scaled to integers~\cite{ortoolsdoc}. CP-SAT is not described as an exact proof of global optimality for all large instances because a time limit is used; instead, it is treated as a strong classical reference.
 
 \subsection{QAOA and Ising Mapping}
 
@@ -244,7 +244,7 @@ The variational angles $(\gamma,\beta)$ are optimized locally using COBYLA. In t
 
 \subsection{IBM Quantum Execution}
 
-IBM QAOA is executed using Qiskit Runtime SamplerV2 on a real IBM quantum backend. Qiskit provides an open-source framework for constructing and executing quantum circuits on noisy quantum computers~\cite{qiskit}; the IBM Quantum platform provides cloud access to superconducting quantum processors~\cite{ibmquantum}. In the reported experiments, the backend selected was \texttt{ibm\_kingston}. Each measured bitstring is decoded using Qiskit's little-endian convention and evaluated using the original full QUBO energy. For the larger hardware-scale instances, the QAOA circuit retains the strongest pairwise couplings under a circuit-depth budget; however, all returned bitstrings are scored on the full QUBO. This makes the evaluation conservative: IBM QAOA is graded against the same objective used by CP-SAT, even when the quantum circuit uses a pruned Hamiltonian for hardware feasibility.
+IBM QAOA is executed using Qiskit Runtime SamplerV2 on a real IBM quantum backend. Qiskit provides an open-source framework for constructing and executing quantum circuits on noisy quantum computers~\cite{javadiabhari2024qiskit}; the IBM Quantum platform provides cloud access to superconducting quantum processors~\cite{ibmquantum}. In the reported experiments, the backend selected was \texttt{ibm\_kingston}. Each measured bitstring is decoded using Qiskit's little-endian convention and evaluated using the original full QUBO energy. For the larger hardware-scale instances, the QAOA circuit retains the strongest pairwise couplings under a circuit-depth budget; however, all returned bitstrings are scored on the full QUBO. This makes the evaluation conservative: IBM QAOA is graded against the same objective used by CP-SAT, even when the quantum circuit uses a pruned Hamiltonian for hardware feasibility.
 
 \section{Experimental Design}
 
@@ -292,7 +292,7 @@ CP-SAT has gap $0\%$ by definition. Raw QUBO energy is reported inside each inst
 
 \section{Results}
 \label{sec:results}
-Table~\ref{tab:results} consolidates both panels, CP-SAT is the reference (gap $0\%$); ``Ret.\ coup.''\ is the fraction of coupling weight retained by the quantum circuit. Backends: AerSim.\ $=$ AerSimulator; \texttt{ibm\_kingston} for hardware runs. On the 16-qubit validation instance, Local QAOA and IBM QAOA reach gaps of $0.952\%$ and $0.930\%$ against the CP-SAT reference, while Greedy is $210.676\%$ away. On the hardware-scale instances, IBM QAOA stays within $2.460\%$, $6.269\%$, and $6.623\%$ of CP-SAT at 64, 128, and 152 qubits, and the gap grows with size as the circuit enlarges and the retained-coupling fraction falls.
+Table~\ref{tab:results} consolidates both panels, CP-SAT is the reference (gap $0\%$); ``Ret. coup.''\ retained couplings percentage is the fraction of coupling weight retained by the quantum circuit. Backends: AerSim.\ $=$ AerSimulator; \texttt{ibm\_kingston} for hardware runs. On the 16-qubit validation instance, Local QAOA and IBM QAOA reach gaps of $0.952\%$ and $0.930\%$ against the CP-SAT reference, while Greedy is $210.676\%$ away. On the hardware-scale instances, IBM QAOA stays within $2.460\%$, $6.269\%$, and $6.623\%$ of CP-SAT at 64, 128, and 152 qubits, and the gap grows with size as the circuit enlarges and the retained-coupling fraction falls.
 
 \begin{table}
 \centering
@@ -341,14 +341,16 @@ Qubits & Method & QUBO energy & Gap (\%) & Ret.\ coup.\ (\%) & Runtime (s) / Bac
 \section{Discussion}
 \label{sec:discussion}
 
-The validation panel establishes objective consistency: with all methods on the same full QUBO and both QAOA variants within $1\%$ of CP-SAT, the quantum results are unlikely to be an artifact of a mismatched Hamiltonian, incorrect bit ordering, or an unfair metric. The scalability panel answers a different question---whether the workflow remains executable at hardware-relevant sizes. This is not a proof of quantum advantage: CP-SAT remains a strong reference and QAOA uses a shallow $p=1$ circuit. Still, the IBM gap does not explode from 64 to 152 qubits, staying within roughly $7\%$, which is meaningful because the hardware executes a control-derived QUBO rather than an artificial benchmark. The gap-to-CP-SAT metric is central here, since raw QUBO energies scale with the number of variables and cannot be compared directly across sizes. The retained-coupling fractions ($60.09\%$ at 64 qubits, then $43.45\%$ and $46.43\%$) clarify the interpretation: the large-scale runs are hardware-feasibility demonstrations under a depth budget, not full-depth QAOA optimization of the dense Hamiltonian.
+The validation results establish methodological consistency: with all methods on the same full QUBO and both QAOA variants within $1\%$ of CP-SAT, the quantum results are unlikely to be an artifact of a mismatched Hamiltonian, incorrect bit ordering, or an unfair metric. The scalability panel answers a different question---whether the proposed workflow remains feasible at hardware-relevant scales. These results do not constitute evidence of quantum advantage: CP-SAT remains a strong reference and QAOA uses a shallow $p=1$ circuit. Still, the IBM gap does not explode from 64 to 152 qubits, remaining within approximately $7\%$, which is meaningful because the quantum hardware executes a cybersecurity-inspired control QUBO rather than a synthetic benchmark problem. The gap-to-CP-SAT metric is central here, since raw QUBO energies scale with the number of variables and cannot be compared directly across sizes. The retained-coupling fractions ($60.09\%$ at 64 qubits, then $43.45\%$ and $46.43\%$) clarify the interpretation: the large-scale runs are hardware-feasibility demonstrations under a depth budget, not full-depth QAOA optimization of the dense Hamiltonian.
 
-Several limitations follow from this design. CP-SAT is a reference under a finite time limit rather than a proof of optimality on the larger instances; QAOA is restricted to $p=1$, so higher depth might improve quality but would raise noise sensitivity, transpilation overhead, and barren-plateau risk; the large-scale circuits optimize a pruned Hamiltonian even though all bitstrings are scored on the full QUBO; the formulation uses binary actions, with continuous or multi-level intensities requiring different encodings; and the implementation solves a single finite-horizon plan, leaving a receding-horizon deployment that repeatedly re-optimizes from the updated state to future work.
+Several limitations follow from this design. CP-SAT is a reference under a finite time limit rather than a proof of optimality on the larger instances; QAOA is restricted to $p=1$, so higher depth might improve quality but would raise noise sensitivity, transpilation overhead, and barren-plateau risk~\cite{larocca2025barren}; the large-scale circuits optimize a pruned Hamiltonian even though all bitstrings are scored on the full QUBO; the formulation uses binary actions, with continuous or multi-level intensities requiring different encodings; and the implementation solves a single finite-horizon plan, leaving a receding-horizon deployment that repeatedly re-optimizes from the updated state to future work.
+
+Despite these limitations, the study demonstrates the practical feasibility of solving cybersecurity-oriented optimization problems on current quantum hardware and provides a reproducible benchmark for future investigations of quantum-assisted cyber-defense mechanisms.
 
 \section{Conclusion}
 \label{sec:conclusion}
 
-This paper presented a hybrid quantum--classical framework for cyber-defense optimization. The network is modeled through an extended state vector containing compromise, attacker knowledge, vulnerability exposure, and asset criticality, and a finite-horizon LQR-style objective is transformed exactly into a QUBO over binary defense actions, solved with Greedy, CP-SAT, Local QAOA, and IBM QAOA. Experimental results show that both Local and IBM QAOA remain close to the CP-SAT reference on the validation instance and maintain a moderate gap on larger hardware-scale problems. These results do not establish quantum advantage; they demonstrate that a control-derived cyber-defense QUBO can be executed on real IBM hardware while preserving solution quality close to a strong classical benchmark. Future work will investigate receding-horizon control, improved QAOA parameter transfer, deeper but noise-aware circuits, error mitigation, and larger topologies with richer operational constraints. The supported claim is more specific and experimentally defensible: IBM QAOA produces solutions comparable to a strong classical reference on validation instances and remains within a moderate gap on larger hardware-scale instances.
+This paper presented a hybrid quantum--classical framework for cyber-defense optimization. The network is modeled through an extended state vector containing compromise, attacker knowledge, vulnerability exposure, and asset criticality, and a finite-horizon LQR-style objective is transformed exactly into a QUBO over binary defense actions, solved with Greedy, CP-SAT, Local QAOA, and IBM QAOA. Experimental results demonstrate that both Local QAOA and IBM QAOA produce solutions close to those obtained by the CP-SAT reference solver on the validation instance and maintain a moderate gap on larger hardware-scale problems. Although the results do not demonstrate quantum advantage; they demonstrate that a control-derived cyber-defense QUBO can be successfully executed on real IBM quantum hardware while preserving solution quality close to a strong classical benchmark. Future work will investigate receding-horizon control, improved QAOA parameter transfer, deeper but noise-aware circuits, error mitigation, and larger topologies with richer operational constraints. Therefore, the main experimentally supported claim of this work is that: IBM QAOA produces solutions comparable to a strong classical reference on validation instances and remains within a moderate gap on larger hardware-scale instances. From a cybersecurity perspective, the proposed framework introduces a systematic methodology for translating dynamic cyber-defense decision problems into optimization tasks suitable for both classical and quantum solvers.
 
 \begin{thebibliography}{19}
 
@@ -356,13 +358,11 @@ This paper presented a hybrid quantum--classical framework for cyber-defense opt
 Miehling, E., Rasouli, M., Teneketzis, D.: Control-theoretic approaches to cyber-security. In: Ba\c{s}ar, T., Zaccour, G. (eds.) Handbook of Dynamic Game Theory, pp.~1--27. Springer (2018)
 
 \bibitem{rasouli2014supervisory}
-Rasouli, M., Miehling, E., Teneketzis, D.: A supervisory control approach to dynamic cyber-security. arXiv:1409.0838 (2014)
+Rasouli, M., Miehling, E., Teneketzis, D.: A supervisory control approach to dynamic cyber-security. In: Poovendran, R., Saad, W. (eds.) Decision and Game Theory for Security (GameSec 2014). Lecture Notes in Computer Science, vol. 8840, pp. 86--101. Springer, Cham (2014). \url{https://doi.org/10.1007/978-3-319-12601-2_6}
 
 \bibitem{zhu2013game}
 Zhu, Q., Ba\c{s}ar, T.: Game-theoretic approach to feedback-driven multi-stage moving target defense. In: Decision and Game Theory for Security, pp.~246--263. Springer (2013)
 
-\bibitem{cho2019mtd}
-Cho, J.-H., Sharma, D.P., Alavizadeh, H., Yoon, S., Ben-Asher, N., Moore, T.J., Kim, D.S., Lim, H., Nelson, F.F.: Toward proactive, adaptive defense: A survey on moving target defense. IEEE Communications Surveys \& Tutorials 22(1), 709--745 (2020)
 
 \bibitem{astafieva2025optimal}
 Astafieva, M., Stepanenko, N.: Optimal cybersecurity management: Global controllability of linear models. In: CPITS~2025, CEUR-WS, vol.~3991, pp.~14--25 (2025)
@@ -386,28 +386,60 @@ Google OR-Tools: CP-SAT Solver. \url{https://developers.google.com/optimization/
 Perron, L., Didier, F., Gay, S.: The CP-SAT-LP solver. In: CP~2023, LIPIcs, vol.~280, pp.~3:1--3:2 (2023)
 
 \bibitem{lubinski2024optimization}
-Lubinski, T., Coffrin, C., McGeoch, C., Sathe, P., Apanavicius, J., Bernal Neira, D.E.: Optimization applications as quantum performance benchmarks. arXiv:2302.02278 (2024)
+Lubinski, T., Coffrin, C., McGeoch, C., Sathe, P., Apanavicius, J., Bernal Neira, D.E.: Optimization applications as quantum performance benchmarks. ACM Transactions on Quantum Computing, Volume 5, Issue 3, Pages 1--44 (2024). https://doi.org/10.1145/3678184
 
-\bibitem{khanafer2016stability}
-Khanafer, A., Ba\c{s}ar, T., Gharesifard, B.: Stability of epidemic models over directed graphs: A positive systems approach. Automatica 74, 126--134 (2016)
 
 \bibitem{barabasi1999scaling}
 Barab\'asi, A.-L., Albert, R.: Emergence of scaling in random networks. Science 286(5439), 509--512 (1999)
 
-\bibitem{mcclean2018barren}
-McClean, J.R., Boixo, S., Smelyanskiy, V.N., Babbush, R., Neven, H.: Barren plateaus in quantum neural network training landscapes. Nature Communications 9, 4812 (2018)
-
 \bibitem{bennett1984quantum}
 Bennett, C.H., Brassard, G.: Quantum cryptography: Public key distribution and coin tossing. In: Proc. IEEE~Intl.\ Conf.\ on Computers, Systems and Signal Processing, pp.~175--179 (1984)
 
-\bibitem{garg2022quantum}
-Garg, S., Ramakrishna, K.: Quantum machine learning for cyber threat intelligence: A survey. IEEE Access 10, 112305--112318 (2022)
-
-\bibitem{qiskit}
-Qiskit contributors: Qiskit: An open-source framework for quantum computing. Zenodo (2019). \url{https://doi.org/10.5281/zenodo.2562111}
 
 \bibitem{ibmquantum}
 IBM Quantum: IBM Quantum Platform. \url{https://quantum.ibm.com}
+
+\bibitem{zhang2025mtd}
+Zhang, T., Kong, F., Deng, D., Tang, X., Wu, X., Xu, C., Zhu, L., Liu, J., Ai, B., Han, Z., Deng, R.H.:
+Moving Target Defense Meets Artificial-Intelligence-Driven Network: A Comprehensive Survey.
+IEEE Internet of Things Journal \textbf{12}(10), 13384--13397 (2025).
+\url{https://doi.org/10.1109/JIOT.2025.3533016}
+
+\bibitem{alarcon2026mtd}
+Alarcon, A.I.D., Anaya, E.A., Duarte, N.A.C., Rodríguez, F.J.G.:
+Rethinking Dynamic Security Strategies: A Survey of Moving Target Defense and Self-Defending Systems Design.
+In: Mata-Rivera, M.F., Zagal-Flores, R. (eds.)
+Telematics and Computing (WITCOM 2025).
+Communications in Computer and Information Science, vol. 2704.
+Springer, Cham (2026).
+\url{https://doi.org/10.1007/978-3-032-09735-4_20}
+
+
+\bibitem{pirani2022survey}
+Pirani, M., Mitra, A., Sundaram, S.:
+A Survey of Graph-Theoretic Approaches for Analyzing the Resilience of Networked Control Systems.
+arXiv preprint arXiv:2205.12498 (2022).
+\url{https://doi.org/10.48550/arXiv.2205.12498}
+
+\bibitem{larocca2025barren}
+Larocca, M., Thanasilp, S., Wang, S., et al.:
+Barren Plateaus in Variational Quantum Computing.
+Nature Reviews Physics \textbf{7}, 174--189 (2025).
+\url{https://doi.org/10.1038/s42254-025-00813-9}
+
+\bibitem{cherbal2024security}
+Cherbal, S., Zier, A., Hebal, S., et al.:
+Security in Internet of Things: A Review on Approaches Based on Blockchain, Machine Learning, Cryptography, and Quantum Computing.
+Journal of Supercomputing \textbf{80}, 3738--3816 (2024).
+\url{https://doi.org/10.1007/s11227-023-05616-2}
+
+\bibitem{javadiabhari2024qiskit}
+Javadi-Abhari, A., Treinish, M., Krsulich, K., Wood, C.J., Lishman, J.,
+Gacon, J., Martiel, S., Nation, P.D., Bishop, L.S., Cross, A.W.,
+Johnson, B.R., Gambetta, J.M.:
+Quantum Computing with Qiskit.
+arXiv preprint arXiv:2405.08810 (2024).
+\url{https://doi.org/10.48550/arXiv.2405.08810}
 
 \end{thebibliography}
 
