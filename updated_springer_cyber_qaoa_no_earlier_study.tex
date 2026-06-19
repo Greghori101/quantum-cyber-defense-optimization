@@ -47,7 +47,7 @@ Center of Excellence in Information Assurance (CoEIA), King Saud University, Riy
 \begin{abstract}
 Cyber-defense resource allocation is a dynamic decision problem in which a defender must protect a subset of network nodes while the attack state evolves over time. This paper presents a hybrid quantum--classical framework that formulates cyber defense as a finite-horizon state-space control problem and solves the resulting binary optimization problem using the Quantum Approximate Optimization Algorithm (QAOA) on real IBM quantum hardware. The network is modeled through an extended cyber state vector containing node compromise level, attacker knowledge, vulnerability exposure, and asset criticality. A Linear Quadratic Regulator (LQR)-style cost is expanded over a planning horizon and converted exactly into a Quadratic Unconstrained Binary Optimization (QUBO) problem.
 
-The evaluation is organized into two panels. The first panel validates the method on a 16-qubit instance, where Greedy, CP-SAT, Local QAOA, and IBM QAOA solve the same full QUBO. Local QAOA and IBM QAOA achieve gaps of $0.952\%$ and $0.930\%$ relative to the CP-SAT reference, respectively, while the Greedy baseline is $210.676\%$ away from CP-SAT. The second panel evaluates hardware-scale instances of 64, 128, and 152 qubits using CP-SAT and IBM QAOA. IBM QAOA remains within $2.460\%$, $6.269\%$, and $6.623\%$ of CP-SAT, respectively. These results do not establish quantum advantage; instead, they demonstrate that an LQR-derived cyber-defense QUBO can be executed on current IBM hardware while preserving solution quality close to a strong classical reference.
+The evaluation is organized into two panels. The first panel validates the method on a 16-qubit instance, where Greedy, Constraint Programming-Satisfiability (CP-SAT), Local QAOA, and IBM QAOA solve the same full QUBO. Local QAOA and IBM QAOA achieve gaps of $0.952\%$ and $0.930\%$ relative to the CP-SAT reference, respectively, while the Greedy baseline is $210.676\%$ away from CP-SAT. The second panel evaluates hardware-scale instances of 64, 128, and 152 qubits using CP-SAT and IBM QAOA. IBM QAOA remains within $2.460\%$, $6.269\%$, and $6.623\%$ of CP-SAT, respectively. These results do not establish quantum advantage; instead, they demonstrate that an LQR-derived cyber-defense QUBO can be executed on current IBM hardware while preserving solution quality close to a strong classical reference.
 
 
 \keywords{Cyber Defense \and QAOA \and QUBO \and LQR \and State-Space Control \and IBM Quantum \and CP-SAT \and Hybrid Quantum-Classical Computing}
@@ -55,20 +55,22 @@ The evaluation is organized into two panels. The first panel validates the metho
 
 \section{Introduction}
 
-Cyber defense is not a one-shot classification task. A network evolves continuously as adversaries gather information, exploit vulnerable assets, and move across connected systems, so a defender must decide not only which nodes are currently compromised but also which nodes should receive limited defensive resources over a future horizon. This matches a control-theoretic view of security, in which defense actions respond to evolving information and uncertain attacker progression~\cite{miehling2019control,rasouli2014supervisory}, as also studied in moving target defense, where the defender dynamically reshapes the attack surface~\cite{zhu2013game,zhang2025mtd}.
+Cyber defense is a dynamic decision problem in which defenders must allocate limited resources as attackers gather information, exploit vulnerabilities, and move through a network. This naturally motivates a control-theoretic perspective, where defense actions adapt to evolving system states and attacker behavior~\cite{miehling2019control,rasouli2014supervisory,zhu2013game,zhang2025mtd}.
 
-Classical control theory provides a principled language for such problems. Linear Quadratic Regulator (LQR) formulations balance two competing objectives: reducing the risk represented by the system state---compromise, attacker knowledge, vulnerability exposure, and critical-asset risk---against the cost of excessive control effort. The vulnerability term is motivated by operational scoring systems such as CVSS~\cite{nistcvss,firstcvss}. Because defense decisions are typically discrete (patch a node or not), the resulting control problem can be cast as a binary optimization problem. Quantum Approximate Optimization Algorithm (QAOA) is a variational optimization method designed for binary combinatorial problems on NISQ hardware~\cite{farhi2014qaoa,cerezo2021variational}. The central idea of this work is to use LQR as a mathematically interpretable generator of cyber-defense QUBOs and to evaluate whether those QUBOs can be solved on current IBM quantum hardware.
+LQR provides a principled framework for balancing cyber risk against defense effort. In this work, the system state includes compromise level, attacker knowledge, vulnerability exposure, and asset criticality, with vulnerability assessment motivated by CVSS~\cite{nistcvss,firstcvss}. Since defense actions are binary, the finite-horizon control problem can be formulated as a QUBO problem and solved using the QAOA on NISQ hardware~\cite{farhi2014qaoa,cerezo2021variational}.
 
-A meaningful classical reference is essential, since comparing a quantum method only against a weak heuristic can overstate performance. We therefore adopt CP-SAT---an integer-programming and combinatorial solver from the Google OR-Tools suite---as the primary reference~\cite{ortoolsdoc,perron2023cpsat}, consistent with recent benchmarking practices for quantum optimization~\cite{lubinski2024optimization}. The evaluation separates a validation panel (Greedy, CP-SAT, Local QAOA, and IBM QAOA on the same full 16-qubit QUBO) from a scalability panel (CP-SAT and IBM QAOA on 64-, 128-, and 152-qubit instances).
+To provide a meaningful evaluation, CP-SAT is adopted as the primary classical reference rather than comparing only against heuristic methods~\cite{ortoolsdoc,perron2023cpsat,lubinski2024optimization}. The experiments are divided into a validation panel comparing Greedy, CP-SAT, Local QAOA, and IBM QAOA on a common 16-qubit QUBO, and a scalability panel comparing CP-SAT and IBM QAOA on 64-, 128-, and 152-qubit instances.
 
-The contributions of this paper are:
+The main contributions of this paper are:
 \begin{itemize}
-	\item an extended state-space cyber-defense model incorporating compromise level, attacker knowledge, vulnerability exposure, and asset criticality;
-	\item an exact finite-horizon LQR-to-QUBO transformation for binary cyber-defense actions;
-	\item a hybrid quantum--classical implementation using Local QAOA simulation and IBM quantum hardware;
-	\item a CP-SAT benchmark methodology based on gap-to-reference evaluation;
-	\item validation and hardware-scale experiments up to 152 qubits.
+\item an extended cyber-defense state-space model incorporating compromise level, attacker knowledge, vulnerability exposure, and asset criticality;
+\item an exact finite-horizon LQR-to-QUBO transformation for binary defense actions;
+\item a hybrid quantum--classical implementation using Local QAOA simulation and IBM quantum hardware;
+\item a CP-SAT benchmark methodology based on gap-to-reference evaluation;
+\item validation and hardware-scale experiments up to 152 qubits.
 \end{itemize}
+
+The rest of the paper is organized as follows. Related Work reviews existing literature. Cyber-Defense State-Space Model presents the proposed model. Finite-Horizon LQR-to-QUBO Formulation derives the optimization framework. Optimization Methods describes the solution approaches. Experimental Design outlines the evaluation methodology. Results presents the experimental findings. Discussion analyzes the results and limitations. Finally, Conclusion summarizes the paper and future directions.
 
 \section{Related Work}
 \label{sec:related}
@@ -77,7 +79,7 @@ Control-theoretic approaches treat defense as a dynamic decision problem rather 
 
 Network structure shapes cyber-risk propagation. Positive-systems and epidemic models over directed graphs admit characterizable stability conditions~\cite{pirani2022survey}. Vulnerability exposure is commonly quantified using CVSS metrics~\cite{nistcvss,firstcvss}.
 
-On the quantum side, QAOA performs approximate combinatorial optimization with depth set by an integer $p$\cite{farhi2014qaoa}, and variational quantum algorithms more broadly face challenges in trainability, accuracy, noise, and sampling\cite{cerezo2021variational}, including barren plateaus where the landscape becomes nearly flat~\cite{larocca2025barren}. Quantum methods in cybersecurity have so far centered on cryptography~\cite{bennett1984quantum} and machine learning~\cite{cherbal2024security}. For the classical reference, CP-SAT is an integer-programming and combinatorial solver in Google OR-Tools~\cite{ortoolsdoc,perron2023cpsat}, and we report gap-to-reference metrics consistent with recent quantum optimization benchmarking practices~\cite{lubinski2024optimization}.
+From the quantum side, QAOA performs approximate combinatorial optimization with depth set by an integer $p$ ~\cite{farhi2014qaoa}, and variational quantum algorithms more broadly face challenges in trainability, accuracy, noise, and sampling~\cite{cerezo2021variational}, including barren plateaus where the landscape becomes nearly flat~\cite{larocca2025barren}. Quantum methods in cybersecurity have so far centered on cryptography ~\cite{bennett1984quantum} and machine learning ~\cite{cherbal2024security}. For the classical reference, CP-SAT is an integer-programming and combinatorial solver in Google OR-Tools ~\cite{ortoolsdoc,perron2023cpsat}, and we report gap-to-reference metrics consistent with recent quantum optimization benchmarking practices ~\cite{lubinski2024optimization}.
 
 
 \section{Cyber-Defense State-Space Model}
