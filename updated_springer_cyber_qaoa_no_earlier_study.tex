@@ -45,9 +45,7 @@ Center of Excellence in Information Assurance (CoEIA), King Saud University, Riy
 \maketitle
 
 \begin{abstract}
-Cyber-defense resource allocation is a dynamic decision problem in which a defender must protect a subset of network nodes while the attack state evolves over time. This paper presents a hybrid quantum--classical framework that formulates cyber defense as a finite-horizon state-space control problem and solves the resulting binary optimization problem using the Quantum Approximate Optimization Algorithm (QAOA) on real IBM quantum hardware. The network is modeled through an extended cyber state vector containing node compromise level, attacker knowledge, vulnerability exposure, and asset criticality. A Linear Quadratic Regulator (LQR)-style cost is expanded over a planning horizon and converted exactly into a Quadratic Unconstrained Binary Optimization (QUBO) problem.
-
-The evaluation is organized into two panels. The first panel validates the method on a 16-qubit instance, where Greedy, Constraint Programming-Satisfiability (CP-SAT), Local QAOA, and IBM QAOA solve the same full QUBO. Local QAOA and IBM QAOA achieve gaps of $0.952\%$ and $0.930\%$ relative to the CP-SAT reference, respectively, while the Greedy baseline is $210.676\%$ away from CP-SAT. The second panel evaluates hardware-scale instances of 64, 128, and 152 qubits using CP-SAT and IBM QAOA. IBM QAOA remains within $2.460\%$, $6.269\%$, and $6.623\%$ of CP-SAT, respectively. These results do not establish quantum advantage; instead, they demonstrate that an LQR-derived cyber-defense QUBO can be executed on current IBM hardware while preserving solution quality close to a strong classical reference.
+This paper presents a hybrid quantum classical framework for cyber-defense optimization. Cyber defense is formulated as a finite-horizon state-space control problem, where the cyber state includes compromise level, attacker knowledge, vulnerability exposure, and asset criticality. An exact LQR-to-QUBO transformation converts the problem into a binary optimization model solved using QAOA on real IBM quantum hardware. The evaluation includes two panels. On a 16-qubit validation instance, Local QAOA and IBM QAOA achieve gaps of $0.952\%$ and $0.930\%$ relative to CP-SAT, while Greedy is $210.676\%$ away. On 64, 128, and 152-qubit instances, IBM QAOA remains within $2.460\%$, $6.269\%$, and $6.623\%$ of CP-SAT. The results show that LQR-derived cyber-defense QUBOs can run on current IBM hardware with solution quality close to a strong classical reference.
 
 
 \keywords{Cyber Defense \and QAOA \and QUBO \and LQR \and State-Space Control \and IBM Quantum \and CP-SAT \and Hybrid Quantum-Classical Computing}
@@ -365,9 +363,11 @@ Rasouli, M., Miehling, E., Teneketzis, D.: A supervisory control approach to dyn
 \bibitem{zhu2013game}
 Zhu, Q., Ba\c{s}ar, T.: Game-theoretic approach to feedback-driven multi-stage moving target defense. In: Decision and Game Theory for Security, pp.~246--263. Springer (2013)
 
-
-\bibitem{astafieva2025optimal}
-Astafieva, M., Stepanenko, N.: Optimal cybersecurity management: Global controllability of linear models. In: CPITS~2025, CEUR-WS, vol.~3991, pp.~14--25 (2025)
+\bibitem{zhang2025mtd}
+Zhang, T., Kong, F., Deng, D., Tang, X., Wu, X., Xu, C., Zhu, L., Liu, J., Ai, B., Han, Z., Deng, R.H.:
+Moving Target Defense Meets Artificial-Intelligence-Driven Network: A Comprehensive Survey.
+IEEE Internet of Things Journal \textbf{12}(10), 13384--13397 (2025).
+\url{https://doi.org/10.1109/JIOT.2025.3533016}
 
 \bibitem{nistcvss}
 National Institute of Standards and Technology: National Vulnerability Database: Vulnerability Metrics. \url{https://nvd.nist.gov/vuln-metrics/cvss}
@@ -390,32 +390,8 @@ Perron, L., Didier, F., Gay, S.: The CP-SAT-LP solver. In: CP~2023, LIPIcs, vol.
 \bibitem{lubinski2024optimization}
 Lubinski, T., Coffrin, C., McGeoch, C., Sathe, P., Apanavicius, J., Bernal Neira, D.E.: Optimization applications as quantum performance benchmarks. ACM Transactions on Quantum Computing, Volume 5, Issue 3, Pages 1--44 (2024). https://doi.org/10.1145/3678184
 
-
-\bibitem{barabasi1999scaling}
-Barab\'asi, A.-L., Albert, R.: Emergence of scaling in random networks. Science 286(5439), 509--512 (1999)
-
-\bibitem{bennett1984quantum}
-Bennett, C.H., Brassard, G.: Quantum cryptography: Public key distribution and coin tossing. In: Proc. IEEE~Intl.\ Conf.\ on Computers, Systems and Signal Processing, pp.~175--179 (1984)
-
-
-\bibitem{ibmquantum}
-IBM Quantum: IBM Quantum Platform. \url{https://quantum.ibm.com}
-
-\bibitem{zhang2025mtd}
-Zhang, T., Kong, F., Deng, D., Tang, X., Wu, X., Xu, C., Zhu, L., Liu, J., Ai, B., Han, Z., Deng, R.H.:
-Moving Target Defense Meets Artificial-Intelligence-Driven Network: A Comprehensive Survey.
-IEEE Internet of Things Journal \textbf{12}(10), 13384--13397 (2025).
-\url{https://doi.org/10.1109/JIOT.2025.3533016}
-
-\bibitem{alarcon2026mtd}
-Alarcon, A.I.D., Anaya, E.A., Duarte, N.A.C., Rodríguez, F.J.G.:
-Rethinking Dynamic Security Strategies: A Survey of Moving Target Defense and Self-Defending Systems Design.
-In: Mata-Rivera, M.F., Zagal-Flores, R. (eds.)
-Telematics and Computing (WITCOM 2025).
-Communications in Computer and Information Science, vol. 2704.
-Springer, Cham (2026).
-\url{https://doi.org/10.1007/978-3-032-09735-4_20}
-
+\bibitem{astafieva2025optimal}
+Astafieva, M., Stepanenko, N.: Optimal cybersecurity management: Global controllability of linear models. In: CPITS~2025, CEUR-WS, vol.~3991, pp.~14--25 (2025)
 
 \bibitem{pirani2022survey}
 Pirani, M., Mitra, A., Sundaram, S.:
@@ -429,11 +405,17 @@ Barren Plateaus in Variational Quantum Computing.
 Nature Reviews Physics \textbf{7}, 174--189 (2025).
 \url{https://doi.org/10.1038/s42254-025-00813-9}
 
+\bibitem{bennett1984quantum}
+Bennett, C.H., Brassard, G.: Quantum cryptography: Public key distribution and coin tossing. In: Proc. IEEE~Intl.\ Conf.\ on Computers, Systems and Signal Processing, pp.~175--179 (1984)
+
 \bibitem{cherbal2024security}
 Cherbal, S., Zier, A., Hebal, S., et al.:
 Security in Internet of Things: A Review on Approaches Based on Blockchain, Machine Learning, Cryptography, and Quantum Computing.
 Journal of Supercomputing \textbf{80}, 3738--3816 (2024).
 \url{https://doi.org/10.1007/s11227-023-05616-2}
+
+\bibitem{barabasi1999scaling}
+Barab\'asi, A.-L., Albert, R.: Emergence of scaling in random networks. Science 286(5439), 509--512 (1999)
 
 \bibitem{javadiabhari2024qiskit}
 Javadi-Abhari, A., Treinish, M., Krsulich, K., Wood, C.J., Lishman, J.,
@@ -443,6 +425,11 @@ Quantum Computing with Qiskit.
 arXiv preprint arXiv:2405.08810 (2024).
 \url{https://doi.org/10.48550/arXiv.2405.08810}
 
+\bibitem{ibmquantum}
+IBM Quantum: IBM Quantum Platform. \url{https://quantum.ibm.com}
+
+
 \end{thebibliography}
+
 
 \end{document}
