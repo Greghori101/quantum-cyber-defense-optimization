@@ -45,8 +45,7 @@ Center of Excellence in Information Assurance (CoEIA), King Saud University, Riy
 \maketitle
 
 \begin{abstract}
-This paper presents a hybrid quantum classical framework for cyber-defense optimization. Cyber defense is formulated as a finite-horizon state-space control problem, where the cyber state includes compromise level, attacker knowledge, vulnerability exposure, and  asset criticality. An exact LQR-to-QUBO transformation converts the problem into a binary optimization model solved using QAOA on real IBM quantum hardware. The evaluation includes two panels. On a 16-qubit validation instance, Local QAOA and IBM QAOA achieve gaps of $0.952\%$ and $0.930\%$ relative to CP-SAT, while Greedy is $210.676\%$ away. On 64, 128, and 152-qubit instances, IBM QAOA remains within $2.460\%$, $6.269\%$, and $6.623\%$ of CP-SAT. The results show that LQR-derived cyber-defense QUBOs can run on current IBM hardware with solution quality close to a strong classical reference.
-
+This paper presents a hybrid quantum classical framework for cyber-defense optimization. Cyber defense is formulated as a finite-horizon state-space control problem, where the cyber state includes compromise level, attacker knowledge, vulnerability exposure, and asset criticality. An exact Linear Quadratic Regulator (LQR)-to-Quadratic Unconstrained Binary Optimization (QUBO) transformation converts the problem into a binary optimization model solved using the Quantum Approximate Optimization Algorithm (QAOA) on real IBM Noisy Intermediate-Scale Quantum (NISQ) hardware. The evaluation includes two panels. On a 16-qubit validation instance, Local QAOA and IBM QAOA achieve gaps of $0.952\%$ and $0.930\%$ relative to Constraint Programming SAT (CP-SAT), while Greedy is $210.676\%$ away. On 64, 128, and 152-qubit instances, IBM QAOA remains within $2.460\%$, $6.269\%$, and $6.623\%$ of CP-SAT. The results show that LQR-derived cyber-defense QUBOs can run on current IBM hardware with solution quality close to a strong classical reference.
 
 \keywords{Cyber Defense \and QAOA \and QUBO \and LQR \and State-Space Control \and IBM Quantum \and CP-SAT \and Hybrid Quantum-Classical Computing}
 \end{abstract}
@@ -55,9 +54,9 @@ This paper presents a hybrid quantum classical framework for cyber-defense optim
 
 Cyber defense is a dynamic decision problem in which defenders must allocate limited resources as attackers gather information, exploit vulnerabilities, and move through a network. This naturally motivates a control-theoretic perspective, where defense actions adapt to evolving system states and attacker behavior~\cite{miehling2019control,rasouli2014supervisory,zhu2013game,zhang2025mtd}.
 
-LQR provides a principled framework for balancing cyber risk against defense effort. In this work, the system state includes compromise level, attacker knowledge, vulnerability exposure, and asset criticality, with vulnerability assessment motivated by CVSS~\cite{nistcvss,firstcvss}. Since defense actions are binary, the finite-horizon control problem can be formulated as a QUBO problem and solved using the QAOA on NISQ hardware~\cite{farhi2014qaoa,cerezo2021variational}.
+Linear Quadratic Regulator (LQR) provides a principled framework for balancing cyber risk against defense effort. In this work, the system state includes compromise level, attacker knowledge, vulnerability exposure, and asset criticality, with vulnerability assessment motivated by the Common Vulnerability Scoring System (CVSS)~\cite{nistcvss,firstcvss}. Since defense actions are binary, the finite-horizon control problem can be formulated as a Quadratic Unconstrained Binary Optimization (QUBO) problem and solved using the Quantum Approximate Optimization Algorithm (QAOA) on Noisy Intermediate-Scale Quantum (NISQ) hardware~\cite{farhi2014qaoa,cerezo2021variational}.
 
-To provide a meaningful evaluation, CP-SAT is adopted as the primary classical reference rather than comparing only against heuristic methods~\cite{ortoolsdoc,perron2023cpsat,lubinski2024optimization}. The experiments are divided into a validation panel comparing Greedy, CP-SAT, Local QAOA, and IBM QAOA on a common 16-qubit QUBO, and a scalability panel comparing CP-SAT and IBM QAOA on 64-, 128-, and 152-qubit instances.
+To provide a meaningful evaluation, CP-SAT (Constraint Programming SAT) is adopted as the primary classical reference rather than comparing only against heuristic methods~\cite{ortoolsdoc,perron2023cpsat,lubinski2024optimization}. The experiments are divided into a validation panel comparing Greedy, CP-SAT, Local QAOA, and IBM QAOA on a common 16-qubit QUBO, and a scalability panel comparing CP-SAT and IBM QAOA on 64-, 128-, and 152-qubit instances.
 
 The main contributions of this paper are:
 \begin{itemize}
@@ -105,6 +104,8 @@ c_k
 \end{equation}
 where each block is in $\mathbb{R}^{n}$. This representation is more realistic than using compromise and attacker knowledge alone. Two nodes may have the same compromise level but different security priorities if one is a database server and the other is a low-value workstation. Similarly, a currently uncompromised node may still require attention if it is highly vulnerable or highly critical.
 
+Here $k$ denotes the discrete time step (control index) for the finite-horizon model.
+
 \subsection{Networked Dynamics}
 
 Let $W \in \mathbb{R}^{n \times n}$ denote a row-normalized network adjacency matrix. In the implementation, $W$ is generated using a Barab\'asi--Albert graph to introduce heterogeneous connectivity~\cite{barabasi1999scaling}. The state evolves as
@@ -113,6 +114,8 @@ x_{k+1}=Ax_k+Bu_k+Fw_k,
 \label{eq:state}
 \end{equation}
 where $u_k \in \{0,1\}^{n}$ is the binary defense action and $w_k \in \mathbb{R}^{n}$ is the attack disturbance.
+
+In Eq.~\eqref{eq:state}, the matrices $A$, $B$, and $F$ have a block structure consistent with the four sub-states per node: $A$ is the state-transition matrix assembled from the $(s,\theta,v,c)$ sub-block dynamics; $B$ maps binary defenses into the attacker-knowledge and vulnerability components (affecting $\theta$ and $v$); and $F$ injects disturbances into the attacker-knowledge and vulnerability channels. The scalar parameters appearing below are interpretable: $\delta_s$ is the natural decay rate of compromise, $\beta_{\mathrm{self}}$ and $\beta_{\mathrm{net}}$ are self and network coupling strengths from attacker knowledge to compromise, $\rho_v$ couples vulnerability into compromise evolution, $\gamma_\theta$ is attacker-knowledge decay, $\theta_{\mathrm{spread}}$ controls knowledge spread over the network, $\eta_\theta$ and $\eta_v$ are control-effectiveness coefficients on knowledge and vulnerability, $\lambda_v$ is vulnerability decay, and $\alpha$ scales the disturbance into attacker knowledge. These parameters are representative and tunable to domain settings.
 
 The implemented block structure is
 \begin{align}
@@ -128,7 +131,7 @@ v_{k+1} &=
 c_{k+1} &= c_k.
 \end{align}
 
-The control input reduces attacker knowledge and vulnerability exposure. The disturbance injects attacker pressure into knowledge and vulnerability. Asset criticality is modeled as slowly varying over the control horizon, so it remains constant during one optimization instance. The cost weights used in the experiments are
+The control input reduces attacker knowledge and vulnerability exposure and the disturbance injects attacker pressure into knowledge and vulnerability. Asset criticality is modeled as slowly varying over the control horizon, so it remains constant during one optimization instance. The numeric coefficient 0.20 in the vulnerability update is a normalized disturbance-strength parameter chosen to introduce moderate attacker pressure in our experiments; it is not a physical constant and can be tuned to reflect domain-specific attacker intensity. The cost weights used in the experiments are
 \begin{equation}
 Q=\mathrm{diag}(4I_n,3I_n,2I_n,1.5I_n), \qquad R=0.08I_n.
 \end{equation}
@@ -150,6 +153,7 @@ The number of binary variables is therefore
 \begin{equation}
 q=nH.
 \end{equation}
+Note that $x_k$ (Eq.~\ref{eq:state}) has dimension $4n$ (four state variables per node at a single time step), whereas the decision vector $U$ stacks the $n$ binary actions across $H$ time steps and therefore has dimension $nH$.
 For example, $n=8$ and $H=8$ gives $q=64$ binary variables, which correspond to a 64-qubit QUBO circuit.
 
 The finite-horizon LQR-style objective is
@@ -240,7 +244,7 @@ where
 U_C(\gamma)=e^{-i\gamma \hat{H}_C}, \qquad
 U_M(\beta)=e^{-i\beta\sum_i X_i}.
 \end{equation}
-The variational angles $(\gamma,\beta)$ are optimized locally using COBYLA. In the validation panel, Local QAOA is run on the full QUBO. The optimized validation angles are then reused for IBM hardware execution. This design follows the near-term VQA paradigm in which a classical optimizer trains a parameterized quantum circuit~\cite{cerezo2021variational}.
+The variational angles $(\gamma,\beta)$ are optimized locally using COBYLA (Constrained Optimization BY Linear Approximations)~\cite{powell1994direct}. In the validation panel, Local QAOA is run on the full QUBO. The optimized validation angles are then reused for IBM hardware execution. This design follows the near-term VQA paradigm in which a classical optimizer trains a parameterized quantum circuit~\cite{cerezo2021variational}.
 
 \subsection{IBM Quantum Execution}
 
@@ -299,28 +303,34 @@ Table~\ref{tab:results} consolidates both panels, CP-SAT is the reference (gap $
 \caption{Consolidated validation (16-qubit) and scalability (64/128/152-qubit) results.}
 \label{tab:results}
 \small
-\begin{tabular}{rlrrrl}
-\toprule
-Qubits & Method & QUBO energy & Gap (\%) & Ret.\ coup.\ (\%) & Runtime (s) / Backend \\
-\midrule
-\multirow{4}{*}{16}
- & Greedy     & $152.8038$  & 210.676 & --     & 0.000 / Classical \\
- & CP-SAT     & $-138.0638$ & 0.000   & 100.00 & 0.059 / Classical \\
- & Local QAOA & $-136.7491$ & 0.952   & 100.00 & 0.380 / AerSim. \\
- & IBM QAOA   & $-136.7804$ & 0.930   & 100.00 & 6.998 / \texttt{ibm\_kingston} \\
-\midrule
-\multirow{2}{*}{64}
- & CP-SAT     & $-3602.9019$ & 0.000  & 100.00 & 20.032 / Classical \\
- & IBM QAOA   & $-3514.2550$ & 2.460  & 60.09  & 7.475 / \texttt{ibm\_kingston} \\
-\midrule
-\multirow{2}{*}{128}
- & CP-SAT     & $-6998.8615$ & 0.000  & 100.00 & 20.115 / Classical \\
- & IBM QAOA   & $-6560.1376$ & 6.269  & 43.45  & 19.597 / \texttt{ibm\_kingston} \\
-\midrule
-\multirow{2}{*}{152}
- & CP-SAT     & $-8183.6290$ & 0.000  & 100.00 & 20.150 / Classical \\
- & IBM QAOA   & $-7641.6357$ & 6.623  & 46.43  & 10.924 / \texttt{ibm\_kingston} \\
-\bottomrule
+\begin{tabular}{|c|l|r|r|r|l|}
+\hline
+Qubits & Method & QUBO energy & Gap (\%) & Ret. coup. (\%) & Runtime (s) / Backend \\
+\hline
+\multirow{4}{*}{16} 
+& Greedy     & $152.8038$  & 210.676 & --     & 0.000 / Classical \\
+\cline{2-6}
+& CP-SAT     & $-138.0638$ & 0.000   & 100.00 & 0.059 / Classical \\
+\cline{2-6}
+& Local QAOA & $-136.7491$ & 0.952   & 100.00 & 0.380 / AerSim. \\
+\cline{2-6}
+& IBM QAOA   & $-136.7804$ & 0.930   & 100.00 & 6.998 / \texttt{ibm\_kingston} \\
+\hline
+\multirow{2}{*}{64} 
+& CP-SAT     & $-3602.9019$ & 0.000  & 100.00 & 20.032 / Classical \\
+\cline{2-6}
+& IBM QAOA   & $-3514.2550$ & 2.460  & 60.09  & 7.475 / \texttt{ibm\_kingston} \\
+\hline
+\multirow{2}{*}{128} 
+& CP-SAT     & $-6998.8615$ & 0.000  & 100.00 & 20.115 / Classical \\
+\cline{2-6}
+& IBM QAOA   & $-6560.1376$ & 6.269  & 43.45  & 19.597 / \texttt{ibm\_kingston} \\
+\hline
+\multirow{2}{*}{152} 
+& CP-SAT     & $-8183.6290$ & 0.000  & 100.00 & 20.150 / Classical \\
+\cline{2-6}
+& IBM QAOA   & $-7641.6357$ & 6.623  & 46.43  & 10.924 / \texttt{ibm\_kingston} \\
+\hline
 \end{tabular}
 \end{table}
 
@@ -343,7 +353,7 @@ Qubits & Method & QUBO energy & Gap (\%) & Ret.\ coup.\ (\%) & Runtime (s) / Bac
 
 The validation results establish methodological consistency: with all methods on the same full QUBO and both QAOA variants within $1\%$ of CP-SAT, the quantum results are unlikely to be an artifact of a mismatched Hamiltonian, incorrect bit ordering, or an unfair metric. The scalability panel answers a different question---whether the proposed workflow remains feasible at hardware-relevant scales. These results do not constitute evidence of quantum advantage: CP-SAT remains a strong reference and QAOA uses a shallow $p=1$ circuit. Still, the IBM gap does not explode from 64 to 152 qubits, remaining within approximately $7\%$, which is meaningful because the quantum hardware executes a cybersecurity-inspired control QUBO rather than a synthetic benchmark problem. The gap-to-CP-SAT metric is central here, since raw QUBO energies scale with the number of variables and cannot be compared directly across sizes. The retained-coupling fractions ($60.09\%$ at 64 qubits, then $43.45\%$ and $46.43\%$) clarify the interpretation: the large-scale runs are hardware-feasibility demonstrations under a depth budget, not full-depth QAOA optimization of the dense Hamiltonian.
 
-Several limitations follow from this design. CP-SAT is a reference under a finite time limit rather than a proof of optimality on the larger instances, QAOA is restricted to $p=1$, so higher depth might improve quality but would raise noise sensitivity, transpilation overhead, and barren-plateau risk~\cite{larocca2025barren}, the large-scale circuits optimize a pruned Hamiltonian even though all bitstrings are scored on the full QUBO, the formulation uses binary actions, with continuous or multi-level intensities requiring different encodings, and the implementation solves a single finite-horizon plan, leaving a receding-horizon deployment that repeatedly re-optimizes from the updated state to future work.
+Several limitations follow from this design. CP-SAT is a reference under a finite time limit rather than a proof of optimality on the larger instances; furthermore, CP-SAT scaling becomes problematic as $q=nH$ grows and the QUBO coupling density increases, causing solver time and memory requirements to rise rapidly. QAOA is restricted to $p=1$, so higher depth might improve quality but would raise noise sensitivity, transpilation overhead, and barren-plateau risk~\cite{larocca2025barren}. The large-scale circuits optimize a pruned Hamiltonian even though all bitstrings are scored on the full QUBO, the formulation uses binary actions (continuous or multi-level intensities require different encodings), and the implementation solves a single finite-horizon plan, leaving a receding-horizon deployment that repeatedly re-optimizes from the updated state to future work.
 
 Despite these limitations, the study demonstrates the practical feasibility of solving cybersecurity-oriented optimization problems on current quantum hardware and provides a reproducible benchmark for future investigations of quantum-assisted cyber-defense mechanisms.
 
@@ -416,6 +426,10 @@ Journal of Supercomputing \textbf{80}, 3738--3816 (2024).
 
 \bibitem{barabasi1999scaling}
 Barab\'asi, A.-L., Albert, R.: Emergence of scaling in random networks. Science 286(5439), 509--512 (1999)
+
+\bibitem{powell1994direct}
+Powell, M.~J.~D.: A direct search optimization method that models the objective and constraint functions by linear interpolation. In: Advances in optimization and numerical analysis, pp. 51--67. Springer (1994).
+\url{https://doi.org/10.1007/978-94-015-8330-5_4}
 
 \bibitem{javadiabhari2024qiskit}
 Javadi-Abhari, A., Treinish, M., Krsulich, K., Wood, C.J., Lishman, J.,
